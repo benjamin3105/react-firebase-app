@@ -13,12 +13,21 @@ import AddTodo from './components/AddTodo';
 
 function App() {
     const [todos, setTodos] = useState([])
-
+    const [progress, setProgress] = useState('Todo')
     useEffect(() => {
       firestore.getDocs(firestore.collection(db, "todos")).then((querySnapshot) => {
         setTodos(querySnapshot.docs.map(doc => doc.data()))
       })   
     },[])
+
+    useEffect(() => {
+      setProgress('Todo')
+    }, [])
+
+    function handleTodo(value) {
+      setProgress(value)
+    }
+ 
     
 
   // const addEntry = () => {
@@ -72,7 +81,7 @@ function App() {
   return (
     <div className="App">
 
-    <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 bg-gray-800">
+    <nav className="w-100 px-4 sm:px-6 lg:px-8 bg-gray-800">
       <div className="flex items-center justify-between h-16">
         <div className='flex items-center'>
         
@@ -82,6 +91,15 @@ function App() {
 
         <div className='hidden md:block'>
         <div className='ml-4 flex items-center md:ml-6'>
+        
+        <button className="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium mr-3" 
+        type="button" 
+        data-bs-toggle="offcanvas" 
+        data-bs-target="#offcanvasTop" 
+        aria-controls="offcanvasTop"
+        data-mdb-ripple="true"
+        data-mdb-ripple-color="light">Login</button>
+
         <div className="dropdown relative">
           <a className="dropdown-toggle flex items-center hidden-arrow"
             href="#" id="dropdownMenuButton2" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -116,14 +134,49 @@ function App() {
     </nav>
   
         <header className="bg-white shadow">
-          <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+          <div className="max-w-7xl mx-auto py-6">
             <h1 className="text-3xl font-bold text-gray-900">Firebase App</h1>
           </div>
-
         </header>
         <main>
-          <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-            {/* Replace with your content */}
+          <div className="max-w-7xl mx-auto py-6">
+
+            <button 
+            onClick={() => handleTodo('Todo')}
+            value="Todo"
+            data-mdb-ripple="true"
+            data-mdb-ripple-color="light"
+            className="inline-block px-6 py-2.5 bg-indigo-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-indigo-700 hover:shadow-lg focus:bg-indigo-700 focus:shadow-lg  focus:outline-none focus:ring-0 active:bg-indigo-800 active:shadow-lg transition duration-150 ease-in-out mr-1.5">
+            Todo
+            </button>
+
+            <button 
+            onClick={() => handleTodo('In progress')}
+            value="In progress"
+            data-mdb-ripple="true"
+            data-mdb-ripple-color="light"
+            className="inline-block px-6 py-2.5 bg-indigo-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-indigo-700 hover:shadow-lg focus:bg-indigo-700 focus:shadow-lg  focus:outline-none focus:ring-0 active:bg-indigo-800 active:shadow-lg transition duration-150 ease-in-out mr-1.5">
+            In Progress
+            </button>
+
+            <button 
+            onClick={() => handleTodo('Feedback')}
+            value="Feedback"
+            data-mdb-ripple="true"
+            data-mdb-ripple-color="light"
+            className="inline-block px-6 py-2.5 bg-indigo-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-indigo-700 hover:shadow-lg focus:bg-indigo-700 focus:shadow-lg  focus:outline-none focus:ring-0 active:bg-indigo-800 active:shadow-lg transition duration-150 ease-in-out mr-1.5">
+            Feedback
+            </button>
+
+            <button 
+            onClick={() => handleTodo('Done')}
+            value="Done"
+            data-mdb-ripple="true"
+            data-mdb-ripple-color="light"
+            className="inline-block px-6 py-2.5 bg-indigo-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-indigo-700 hover:shadow-lg focus:bg-indigo-700 focus:shadow-lg  focus:outline-none focus:ring-0 active:bg-indigo-800 active:shadow-lg transition duration-150 ease-in-out mr-1.5">
+            Done
+            </button>            
+
             <div className="px-4 py-6 sm:px-0">
       
               <div className="flex flex-col">
@@ -152,6 +205,9 @@ function App() {
                         </thead>
                         <tbody>
                         {todos.map((todo, i) => (
+
+                          (todo.progress === progress) ? 
+
                           <tr key={i}>
                             <td className="px-6 py-4 whitespace-nowrap">
                               <div className="whitespace-nowrap">
@@ -165,12 +221,14 @@ function App() {
                               
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap">
-                              <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                              {todo.progress}
-                              </span>
+                            <span className="text-xs inline-block py-1 px-2.5 leading-none text-center whitespace-nowrap align-baseline font-bold bg-gray-800 text-white rounded">
+                            {todo.progress}
+                            </span>
+
+                              
                             </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                              {todo.department.map((d, i) => ( <div className="text-sm font-medium text-gray-900" key={i}>{d}</div> ))}
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              {todo.department.map((d, i) => ( <div className="mr-2 text-xs inline-block py-1 px-2.5 leading-none text-center whitespace-nowrap align-baseline font-bold bg-indigo-600 text-white rounded" key={i}>{d}</div> ))}
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                               <a href="#" className="text-indigo-600 hover:text-indigo-900">
@@ -178,6 +236,10 @@ function App() {
                               </a>
                             </td>
                           </tr>        
+                        
+                          : null
+                        
+                        
                         ))}
                         </tbody>
                       </table>
@@ -186,9 +248,46 @@ function App() {
                 </div>
               </div>
               
-              <AddTodo stateChanger={setTodos} todos={todos} />
+
+              <div className="max-w-7xl fixed bottom-4 left-1/2 transform -translate-x-1/2 inline-flex left-0 mx-auto justify-between w-11/12">
               
-              <Login />
+              <button 
+              className="inline-block px-6 py-2.5 bg-indigo-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-indigo-700 hover:shadow-lg focus:bg-indigo-700 focus:shadow-lg  focus:outline-none focus:ring-0 active:bg-indigo-800 active:shadow-lg transition duration-150 ease-in-out mr-1.5" 
+              type="button" 
+              data-bs-toggle="offcanvas" 
+              data-bs-target="#offcanvasRight" 
+              aria-controls="offcanvasRight"
+              data-mdb-ripple="true"
+              data-mdb-ripple-color="light">Add Todo</button>
+
+              </div>
+              
+
+              
+
+              <div className="offcanvas offcanvas-end fixed bottom-0 flex flex-col max-w-full bg-white invisible bg-clip-padding shadow-sm outline-none transition duration-300 ease-in-out text-gray-700 top-0 right-0 border-none w-96" tabIndex="-1" id="offcanvasRight" aria-labelledby="offcanvasRightLabel">
+                <div className="offcanvas-header flex items-center justify-between p-4">
+                  <h5 className="offcanvas-title mb-0 leading-normal font-semibold" id="offcanvasRightLabel">Work it baby!</h5>
+                  <button type="button" className="btn-close box-content w-4 h-4 p-2 -my-5 -mr-2 text-black border-none rounded-none opacity-50 focus:shadow-none focus:outline-none focus:opacity-100 hover:text-black hover:opacity-75 hover:no-underline" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                </div>
+                <div className="offcanvas-body flex-grow p-4 overflow-y-auto">
+                  <AddTodo stateChanger={setTodos} todos={todos} />
+                </div>
+              </div>
+              
+
+              
+
+              <div className="offcanvas offcanvas-top fixed bottom-0 flex flex-col max-w-full bg-white invisible bg-clip-padding shadow-sm outline-none transition duration-300 ease-in-out text-gray-700 top-0 left-0 right-0 border-none h-1/3 max-h-full" tabIndex="-1" id="offcanvasTop" aria-labelledby="offcanvasTopLabel">
+                <div className="offcanvas-header flex items-center justify-between p-4">
+                <h5 className="offcanvas-title mb-0 leading-normal font-semibold" id="offcanvasRightLabel">Login</h5>
+                  <button type="button" className="btn-close box-content w-4 h-4 p-2 -my-5 -mr-2 text-black border-none rounded-none opacity-50 focus:shadow-none focus:outline-none focus:opacity-100 hover:text-black hover:opacity-75 hover:no-underline" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                </div>
+                <div className="offcanvas-body flex-grow p-4 overflow-y-auto">
+                <Login />
+                </div>
+              </div>
+              
 
             </div>
             {/* /End replace */}
