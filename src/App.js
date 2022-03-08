@@ -1,22 +1,32 @@
 import './App.css'
-import { addDoc } from "firebase/firestore"
 import * as firestore from "firebase/firestore"
 import { useState, useEffect } from 'react'
-import { Formik, Field, Form } from 'formik';
 import { db } from './firebase'
+import { doc, deleteDoc, setDoc, collection, addDoc } from "firebase/firestore";
 import Login from './components/Login'
-import AddTodo from './components/AddTodo';
+import AddTodo from './components/AddTodo'
 
-
-
-//import { collection, addDoc, getDocs } from "firebase/firestore" 
+import { auth } from './firebase'
+import { onAuthStateChanged } from "firebase/auth";
 
 function App() {
     const [todos, setTodos] = useState([])
     const [progress, setProgress] = useState('Todo')
+
     useEffect(() => {
       firestore.getDocs(firestore.collection(db, "todos")).then((querySnapshot) => {
-        setTodos(querySnapshot.docs.map(doc => doc.data()))
+
+        // querySnapshot.docs.map((ids) => {
+        
+        //   console.log(ids.id)
+        // })
+
+        // const dataid = querySnapshot.docs.map((doc) =>  ([ {id: doc.id, data: doc.data()}])   )
+
+        const data = querySnapshot.docs.map((doc) => doc.data()  )
+
+        setTodos(data)
+
       })   
     },[])
 
@@ -27,58 +37,30 @@ function App() {
     function handleTodo(value) {
       setProgress(value)
     }
- 
-    
 
-  // const addEntry = () => {
-  //   try {
-  //       const docRef = firestore.addDoc(firestore.collection(db, "todo"), {
-  //           time: dateTime,
-  //           title: "Quotation Firebase Application",
-  //           description: "Our new Firebase application for The Goodplace",
-  //           progress: "Feedback",
-  //           departmennt: "Administration",
-  //       })
-  //       console.log(docRef.title)
-  //       setTodos(prevTodos => {
-  //         return [...todos, {title: docRef.title}]
-  //       })
-  //       console.log("Document written with ID: ", docRef.id)
-  //   } catch (e) {
-  //       console.error("Error adding document: ", e)
-  //       console.log('ERROR')
-  //   }
-  // }
-
-  // useEffect(() => {
-  //   firestore.getDocs(firestore.collection(db, "users")).then((querySnapshot) => {
-  //     querySnapshot.forEach((doc) => {
-  //       console.log(doc)
-  //         // console.log(`${doc.id} => ${doc.data()}`);
-  //     })
-  //   })
-  // },[])
-
-  
-
-    // Create a password-based account
-    // function createUser() {
-    //   createUserWithEmailAndPassword(auth, email, password)
-    //   .then((userCredential) => {
-    //     // Signed in 
-    //     const user = userCredential.user
-    //     console.log(user)
-    //     // ...
-    //   })
-    //   .catch((error) => {
-    //     const errorCode = error.code
-    //     const errorMessage = error.message
-    //     // ..
-    //   })
-    // }
+    useEffect(() => {
+      onAuthStateChanged(auth, (user) => {
+        if (user) {
+          // User is signed in, see docs for a list of available properties
+          // https://firebase.google.com/docs/reference/js/firebase.User
+          const uid = user.uid;
+          console.log('User is signed in')
+        } else {
+          // User is signed out
+          console.log('No user is signed in')
+        }
+      })
+    },[])
 
 
-  return (
+
+    function deleteTodo(e) {
+      alert(e)
+      firestore.deleteDoc(doc(db, "todos", "DOC_ID"))
+    }
+
+
+    return (
     <div className="App">
 
     <nav className="w-100 px-4 sm:px-6 lg:px-8 bg-gray-800">
@@ -86,8 +68,10 @@ function App() {
         <div className='flex items-center'>
         
         <h3 className="text-1xl font-bold text-white">Firebase App</h3>
-        <a href="#" className="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Team</a>
+        <a href="/" className="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Team</a>
         </div>
+
+        
 
         <div className='hidden md:block'>
         <div className='ml-4 flex items-center md:ml-6'>
@@ -102,7 +86,7 @@ function App() {
 
         <div className="dropdown relative">
           <a className="dropdown-toggle flex items-center hidden-arrow"
-            href="#" id="dropdownMenuButton2" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            href="/" id="dropdownMenuButton2" role="button" data-bs-toggle="dropdown" aria-expanded="false">
             <div>
               <div className="max-w-xs bg-gray-800 rounded-full flex items-center text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white">
                 <span className="sr-only">Open user menu</span>
@@ -115,15 +99,15 @@ function App() {
             aria-labelledby="dropdownMenuButton2">
             <li>
               <a className="dropdown-item text-sm py-2 px-4 font-normal block w-full whitespace-nowrap bg-transparent text-gray-700 hover:bg-gray-100"
-                href="#">Action</a>
+                href="/">Action</a>
             </li>
             <li>
               <a className="dropdown-item text-sm py-2 px-4 font-normal block w-full whitespace-nowrap bg-transparent text-gray-700 hover:bg-gray-100"
-                href="#">Another action</a>
+                href="/">Another action</a>
             </li>
             <li>
               <a className="dropdown-item text-sm py-2 px-4 font-normal block w-full whitespace-nowrap bg-transparent text-gray-700 hover:bg-gray-100"
-                href="#">Something else here</a>
+                href="/">Something else here</a>
             </li>
           </ul>
         </div>
@@ -136,6 +120,7 @@ function App() {
         <header className="bg-white shadow">
           <div className="max-w-7xl mx-auto py-6">
             <h1 className="text-3xl font-bold text-gray-900">Firebase App</h1>
+            
           </div>
         </header>
         <main>
@@ -218,6 +203,7 @@ function App() {
                             <td className="px-6 py-4 whitespace-nowrap">
                               <div className="text-sm font-medium text-gray-900">{todo.title}</div>
                               <div className="text-sm text-gray-500">{todo.description}</div>
+                              <div className="text-sm text-gray-500">{todo.id}</div>
                               
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap">
@@ -231,8 +217,8 @@ function App() {
                               {todo.department.map((d, i) => ( <div className="mr-2 text-xs inline-block py-1 px-2.5 leading-none text-center whitespace-nowrap align-baseline font-bold bg-indigo-600 text-white rounded" key={i}>{d}</div> ))}
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                              <a href="#" className="text-indigo-600 hover:text-indigo-900">
-                                Edit
+                              <a href="/" className="text-indigo-600 hover:text-indigo-900">
+                                <div onClick={(e) => deleteTodo(todo.id)}>Delete</div>
                               </a>
                             </td>
                           </tr>        
@@ -249,7 +235,7 @@ function App() {
               </div>
               
 
-              <div className="max-w-7xl fixed bottom-4 left-1/2 transform -translate-x-1/2 inline-flex left-0 mx-auto justify-between w-11/12">
+              {/* <div className="max-w-7xl fixed bottom-4 left-1/2 transform -translate-x-1/2 inline-flex left-0 mx-auto justify-between w-11/12"> */}
               
               <button 
               className="inline-block px-6 py-2.5 bg-indigo-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-indigo-700 hover:shadow-lg focus:bg-indigo-700 focus:shadow-lg  focus:outline-none focus:ring-0 active:bg-indigo-800 active:shadow-lg transition duration-150 ease-in-out mr-1.5" 
@@ -260,7 +246,7 @@ function App() {
               data-mdb-ripple="true"
               data-mdb-ripple-color="light">Add Todo</button>
 
-              </div>
+              {/* </div> */}
               
 
               
@@ -284,23 +270,17 @@ function App() {
                   <button type="button" className="btn-close box-content w-4 h-4 p-2 -my-5 -mr-2 text-black border-none rounded-none opacity-50 focus:shadow-none focus:outline-none focus:opacity-100 hover:text-black hover:opacity-75 hover:no-underline" data-bs-dismiss="offcanvas" aria-label="Close"></button>
                 </div>
                 <div className="offcanvas-body flex-grow p-4 overflow-y-auto">
-                <Login />
+                  <Login />
                 </div>
               </div>
               
 
             </div>
-            {/* /End replace */}
           </div>
         </main> 
 
-
-      
-
-
-    
     </div>
-  );
+  )
 }
 
 export default App

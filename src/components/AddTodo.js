@@ -10,7 +10,6 @@ export default function AddTodo({stateChanger, todos}) {
     // const [todos, setTodos] = useState([])
     const [clients, setClients] = useState([])
     const [users, setUsers] = useState([])
-    const [isActive, setActive] = useState(false)
 
     const today = new Date()
     const date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate()
@@ -30,23 +29,24 @@ export default function AddTodo({stateChanger, todos}) {
     },[])
 
     const addTodo = (values) => {
-        console.log(values)
+        console.log(values.id)
         addDoc(firestore.collection(db, 'todos'), 
         values
-    )
-    stateChanger([...todos, values])
+        )
+        stateChanger([...todos, values])
     }
 
-    // const toggleClass = () => {
-    //     setActive(!isActive)
-    // }
 
     return (
     <main>
+
+
         <Formik
         initialValues={{
+            id: '',
             title: '',
             description: '',
+            hours: '',
             client: '',
             progress: '',
             department: [],
@@ -57,7 +57,7 @@ export default function AddTodo({stateChanger, todos}) {
         resetForm({values: ''})
         }}>
             <Form>
-            <div className="grid">
+            <div className="">
 
                 <div className="mb-3">
                 <label htmlFor="title"
@@ -76,25 +76,49 @@ export default function AddTodo({stateChanger, todos}) {
                 <div className="mb-3">
                 <label htmlFor="client"
                 className="block text-sm font-medium text-gray-700">Client</label>
+                <div className="grid grid-cols-4 gap-1">
+                <div className='col-span-3'>
+                
                 <Field 
                 as="select" 
                 name="client"
                 className='block appearance-none w-full bg-white border border-gray-400 hover:border-gray-500 px-4 py-2 pr-8 rounded shadow leading-tight focus:outline-none focus:shadow-outline"'>
-                <option value selected disabled hidden >Choose client</option>
+                <option value disabled hidden >Choose client</option>
                 {clients.sort((a, b) => a.timeM > b.timeM ? 1:-1).map((client, i) => (
                     <option key={i} value={client.title}>{client.title}</option>
                     
                 ))}
                 </Field>
                 </div>
-                <div className="mb-3">
+                <div>
+                <button className="inline-block w-full h-full px-6 py-2.5 bg-indigo-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-indigo-700 hover:shadow-lg focus:bg-indigo-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-indigo-800 active:shadow-lg transition duration-150 ease-in-out" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+                    +
+                </button>
+                </div>
+                </div>
+                </div>
+
+               
+                <div className="collapse my-2" id="collapseExample">
+                    <AddClient stateChanger={setClients} clients={clients}/> 
+                </div>
+                {/* <div className="mb-3">
                 <div
                 // onClick={toggleClass}
                 data-bs-toggle="modal" data-bs-target="#exampleModal"
                 className="inline-block px-6 py-2.5 bg-indigo-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-indigo-700 hover:shadow-lg focus:bg-indigo-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-indigo-800 active:shadow-lg transition duration-150 ease-in-out">
                 Add Client</div>
                 
+                </div> */}
+
+                <div className="mb-3">
+                <label htmlFor="hours"
+                className="block text-sm font-medium text-gray-700">Hours</label>
+                <Field id="hours" name="hours" placeholder="hours" type="number"                        
+                className="p-2 mt-1 appearance-none border focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" />
                 </div>
+
+                
 
                 <div className="mb-3">
                 <div role="group" aria-labelledby="my-checkbox-group">
@@ -190,14 +214,15 @@ export default function AddTodo({stateChanger, todos}) {
                 </div>
 
                 <button type="submit"
-                className="inline-block px-6 py-2.5 bg-indigo-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-indigo-700 hover:shadow-lg focus:bg-indigo-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-indigo-800 active:shadow-lg transition duration-150 ease-in-out">Submit</button>
+                className="inline-block px-6 py-2.5 bg-indigo-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-indigo-700 hover:shadow-lg focus:bg-indigo-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-indigo-800 active:shadow-lg transition duration-150 ease-in-out">
+                    Add Todo</button>
             </div>
             </Form>
         </Formik>
         
-        <div 
+        {/* <div 
         id="exampleModal"  aria-labelledby="exampleModalLabel" aria-hidden="true"
-        className={`${isActive ? null : "hidden"} modal fade fixed top-0 left-0 w-full hidden h-full outline-none overflow-x-hidden overflow-y-auto `} >
+        className="modal fade fixed top-0 left-0 w-full hidden h-full outline-none overflow-x-hidden overflow-y-auto">
             <div className="modal-dialog relative w-auto pointer-events-none">
             <div className="modal-content border-none shadow-lg relative flex flex-col w-full pointer-events-auto bg-white bg-clip-padding rounded-md outline-none text-current">
             <div className="modal-header flex flex-shrink-0 items-center justify-between p-4 border-b border-gray-200 rounded-t-md">
@@ -211,7 +236,7 @@ export default function AddTodo({stateChanger, todos}) {
                 </div>            
             </div>
             </div>
-        </div>
+        </div> */}
     </main>
     )
 }
